@@ -1,5 +1,5 @@
-// const BASE_URL = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies";
-const BASE_URL = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${USD}.json";
+const API_KEY = '45bd6a0b1b704040e917782b'; // Replace with your API key
+const BASE_URL = 'https://v6.exchangerate-api.com/v6';
 
 const dropdowns = document.querySelectorAll(".dropdown select");
 const btn = document.querySelector("form button");
@@ -7,6 +7,7 @@ const fromCurr = document.querySelector(".from select");
 const toCurr = document.querySelector(".to select");
 const msg = document.querySelector(".msg");
 
+// Populate dropdowns with currency options
 for (let select of dropdowns) {
   for (currCode in countryList) {
     let newOption = document.createElement("option");
@@ -32,13 +33,25 @@ const updateExchangeRate = async () => {
     amtVal = 1;
     amount.value = "1";
   }
-  const URL = `${BASE_URL}/${fromCurr.value.toLowerCase()}/${toCurr.value.toLowerCase()}.json`;
-  let response = await fetch(URL);
-  let data = await response.json();
-  let rate = data[toCurr.value.toLowerCase()];
 
-  let finalAmount = amtVal * rate;
-  msg.innerText = `${amtVal} ${fromCurr.value} = ${finalAmount} ${toCurr.value}`;
+  msg.innerText = "Getting exchange rate...";
+  
+  try {
+    // Using the pair conversion endpoint for better efficiency
+    const URL = `${BASE_URL}/${API_KEY}/pair/${fromCurr.value}/${toCurr.value}/${amtVal}`;
+    const response = await fetch(URL);
+    const data = await response.json();
+    
+    if (data.result === "success") {
+      const finalAmount = data.conversion_result;
+      msg.innerText = `${amtVal} ${fromCurr.value} = ${finalAmount.toFixed(2)} ${toCurr.value}`;
+    } else {
+      throw new Error(data["error-type"]);
+    }
+  } catch (error) {
+    msg.innerText = "An error occurred. Please try again later.";
+    console.error("Error fetching exchange rate:", error);
+  }
 };
 
 const updateFlag = (element) => {
