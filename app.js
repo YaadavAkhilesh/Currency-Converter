@@ -62,6 +62,22 @@ const updateFlag = (element) => {
   img.src = newSrc;
 };
 
+// Add event listener for swap icon
+const swapIcon = document.querySelector(".fa-arrow-right-arrow-left");
+swapIcon.addEventListener("click", () => {
+  // Get the current values
+  let tempCode = fromCurr.value;
+  fromCurr.value = toCurr.value;
+  toCurr.value = tempCode;
+  
+  // Update the flags
+  updateFlag(fromCurr);
+  updateFlag(toCurr);
+  
+  // Update the exchange rate
+  updateExchangeRate();
+});
+
 btn.addEventListener("click", (evt) => {
   evt.preventDefault();
   updateExchangeRate();
